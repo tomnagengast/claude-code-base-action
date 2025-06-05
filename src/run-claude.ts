@@ -103,13 +103,17 @@ export function prepareRunConfig(
 
 export async function runClaude(promptPath: string, options: ClaudeOptions) {
   // Ensure we have a valid OAuth token before running Claude (only if using OAuth)
+  console.log(`CLAUDE_CODE_USE_OAUTH environment variable: ${process.env.CLAUDE_CODE_USE_OAUTH}`);
   if (process.env.CLAUDE_CODE_USE_OAUTH === "1") {
+    console.log("OAuth mode detected, checking token validity...");
     try {
       await ensureValidToken();
     } catch (error) {
       core.setFailed(`OAuth token validation failed: ${error instanceof Error ? error.message : String(error)}`);
       return;
     }
+  } else {
+    console.log("Not using OAuth mode, skipping token validation");
   }
 
   const config = prepareRunConfig(promptPath, options);
