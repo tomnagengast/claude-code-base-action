@@ -73,6 +73,8 @@ export async function ensureValidToken(): Promise<void> {
   const now = Math.floor(Date.now() / 1000);
   const expiresAt = credentials.claudeAiOauth.expiresAt;
 
+  console.log(`Current time: ${now}, Token expires at: ${expiresAt}, Time until expiry: ${expiresAt - now} seconds`);
+
   // Check if token expires within the next 5 minutes (300 seconds buffer)
   if (expiresAt - now <= 300) {
     console.log("Access token expired or expiring soon, refreshing...");
@@ -90,6 +92,8 @@ export async function ensureValidToken(): Promise<void> {
     } catch (error) {
       throw new Error(`Failed to refresh OAuth token: ${error instanceof Error ? error.message : String(error)}`);
     }
+  } else {
+    console.log("Access token is still valid, no refresh needed");
   }
 }
 

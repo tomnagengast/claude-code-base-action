@@ -102,12 +102,14 @@ export function prepareRunConfig(
 }
 
 export async function runClaude(promptPath: string, options: ClaudeOptions) {
-  // Ensure we have a valid OAuth token before running Claude
-  try {
-    await ensureValidToken();
-  } catch (error) {
-    core.setFailed(`OAuth token validation failed: ${error instanceof Error ? error.message : String(error)}`);
-    return;
+  // Ensure we have a valid OAuth token before running Claude (only if using OAuth)
+  if (process.env.CLAUDE_CODE_USE_OAUTH === "1") {
+    try {
+      await ensureValidToken();
+    } catch (error) {
+      core.setFailed(`OAuth token validation failed: ${error instanceof Error ? error.message : String(error)}`);
+      return;
+    }
   }
 
   const config = prepareRunConfig(promptPath, options);
