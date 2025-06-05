@@ -13,11 +13,17 @@ async function run() {
 
     // Setup OAuth credentials if using OAuth authentication
     if (process.env.CLAUDE_CODE_USE_OAUTH === "1") {
-      await setupOAuthCredentials({
-        accessToken: process.env.CLAUDE_ACCESS_TOKEN!,
-        refreshToken: process.env.CLAUDE_REFRESH_TOKEN!,
-        expiresAt: process.env.CLAUDE_EXPIRES_AT!,
-      });
+      try {
+        await setupOAuthCredentials({
+          accessToken: process.env.CLAUDE_ACCESS_TOKEN!,
+          refreshToken: process.env.CLAUDE_REFRESH_TOKEN!,
+          expiresAt: process.env.CLAUDE_EXPIRES_AT!,
+        });
+      } catch (error) {
+        core.setFailed(`Failed to setup OAuth credentials: ${error instanceof Error ? error.message : String(error)}`);
+        core.setOutput("conclusion", "failure");
+        process.exit(1);
+      }
     }
 
     await setupClaudeCodeSettings();

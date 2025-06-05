@@ -4,6 +4,7 @@ import { promisify } from "util";
 import { unlink, writeFile, stat } from "fs/promises";
 import { createWriteStream } from "fs";
 import { spawn } from "child_process";
+import { ensureValidToken } from "./setup-oauth";
 
 const execAsync = promisify(exec);
 
@@ -101,6 +102,14 @@ export function prepareRunConfig(
 }
 
 export async function runClaude(promptPath: string, options: ClaudeOptions) {
+  // Ensure we have a valid OAuth token before running Claude
+  try {
+    await ensureValidToken();
+  } catch (error) {
+    core.setFailed(`OAuth token validation failed: ${error instanceof Error ? error.message : String(error)}`);
+    return;
+  }
+
   const config = prepareRunConfig(promptPath, options);
 
   // Create a named pipe
